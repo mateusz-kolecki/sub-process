@@ -13,5 +13,9 @@ matrix:
     - php: 5.3
       dist: trusty
 
-before_script: composer install --no-interaction
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_script: composer install --no-interaction --prefer-dist
 script: vendor/bin/phpunit
