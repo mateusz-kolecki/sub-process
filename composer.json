@@ -1,0 +1,25 @@
+{
+    "name": "mkolecki/sub-process",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mateusz Kołecki",
+            "email": "kolecki.mateusz@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^4.8"
+    },
+    "require": {},
+    "autoload": {
+      "psr-4": {
+        "SubProcess\\": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "SubProcess\\": "tests/"
+      }
+    }
+}
