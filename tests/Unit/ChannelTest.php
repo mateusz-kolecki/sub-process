@@ -49,7 +49,7 @@ class ChannelTest extends TestCase
             array( null ),
             array( array() ),
             array( array(1, 2, 3, 4, 5) ),
-            array( $this->text(1024 * 1232))]
+            array( $this->text(1024 * 1232) )
         );
     }
 
