@@ -93,7 +93,7 @@ class Process
         }
 
         foreach ($result as $key => $value) {
-            $this->channel->send([$key, $value]);
+            $this->channel->send(array($key, $value));
         }
 
         return 0;
