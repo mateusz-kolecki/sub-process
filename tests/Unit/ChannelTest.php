@@ -38,19 +38,19 @@ class ChannelTest extends TestCase
 
     public function messageDataProvider()
     {
-        return [
-            [ '' ],
-            [ 'some simple text' ],
-            [ 'ðπœę©śəðśðłð…ðąəðó→əśðł…śńəó«↓»' ],
-            [ (object)[] ],
-            [ (object)['foo' => 'bar'] ],
-            [ true ],
-            [ false ],
-            [ null ],
-            [ [] ],
-            [ [1,2,3,4,5] ],
-            [ $this->text(1024 * 1232) ]
-        ];
+        return array(
+            array( '' ),
+            array( 'some simple text' ),
+            array( 'ðπœę©śəðśðłð…ðąəðó→əśðł…śńəó«↓»' ),
+            array( (object)array() ),
+            array( (object)array('foo' => 'bar') ),
+            array( true ),
+            array( false ),
+            array( null ),
+            array( array() ),
+            array( array(1, 2, 3, 4, 5) ),
+            array( $this->text(1024 * 1232))]
+        );
     }
 
     /**

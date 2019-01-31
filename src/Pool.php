@@ -6,7 +6,7 @@ use Countable;
 
 class Pool extends EventEmmiter implements Countable
 {
-    private $processes = [];
+    private $processes = array();
     private $callback;
 
     public function __construct($callback)

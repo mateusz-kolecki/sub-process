@@ -4,19 +4,21 @@ namespace SubProcess;
 
 class EventEmmiter
 {
-    private $eventHandlers = [];
+    private $eventHandlers = array();
 
     public function on($eventName, $callback)
     {
         if (!isset($this->eventHandlers[$eventName])) {
-            $this->eventHandlers[$eventName] = [];
+            $this->eventHandlers[$eventName] = array();
         }
 
         $this->eventHandlers[$eventName][] = $callback;
     }
 
-    public function emit($eventName, ...$args)
+    public function emit($eventName/*, ...$args */)
     {
+        $args = array_slice(func_get_args(), 1);
+
         if (empty($this->eventHandlers[$eventName])) {
             return;
         }
