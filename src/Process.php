@@ -6,6 +6,8 @@ use Iterator;
 use Exception;
 use LogicException;
 
+use SubProcess\Channel\StreamSyncChannel;
+
 class Process
 {
     const STATE_NOT_RUNNING = 0;
@@ -81,13 +83,13 @@ class Process
             $this->exitStatus = null;
 
             fclose($childSocket);
-            $this->channel = new Channel($parentSocket);
+            $this->channel = new StreamSyncChannel($parentSocket);
             $this->pid = $pid;
         } else {
             $this->state = self::STATE_CHILD;
 
             fclose($parentSocket);
-            $this->channel = new Channel($childSocket);
+            $this->channel = new StreamSyncChannel($childSocket);
             $this->pid = getmypid();
 
             try {

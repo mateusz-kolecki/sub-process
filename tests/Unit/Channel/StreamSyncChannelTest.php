@@ -1,13 +1,12 @@
 <?php
 
-namespace SubProcess\Unit;
+namespace SubProcess\Unit\Channel;
 
 use PHPUnit\Framework\TestCase;
-use SubProcess\Channel;
-
+use SubProcess\Channel\StreamSyncChannel;
 use SubProcess\Unit\Assets\PrivatePropsObject;
 
-class ChannelTest extends TestCase
+class StreamSyncChannelTest extends TestCase
 {
     /** @var string */
     private $tmpFileName;
@@ -62,10 +61,10 @@ class ChannelTest extends TestCase
      */
     public function sendingDataShouldWork($sendData)
     {
-        $channelA = new Channel(fopen($this->tmpFileName, 'w'));
+        $channelA = new StreamSyncChannel(fopen($this->tmpFileName, 'w'));
         $channelA->send($sendData);
 
-        $channelB = new Channel(fopen($this->tmpFileName, 'r'));
+        $channelB = new StreamSyncChannel(fopen($this->tmpFileName, 'r'));
         $receivedData = $channelB->read();
 
         $this->assertEquals($sendData, $receivedData);
