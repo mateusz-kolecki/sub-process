@@ -29,6 +29,9 @@ class Pool extends EventEmmiter implements Countable
         $this->processes[$worker->pid()] = $worker;
     }
 
+    /**
+     * @return Process
+     */
     public function wait()
     {
         do {
@@ -45,8 +48,8 @@ class Pool extends EventEmmiter implements Countable
             if ($worker) {
                 unset($this->processes[$pid]);
 
-                $exitInfo = ExitStatus::createFromPcntlStatus($status);
-                $this->emit('exit', $worker, $exitInfo);
+                $exitInfo = $worker->wait();
+                $this->emit('exit', $exitInfo, $worker);
             }
         } while ($worker === null);
 

@@ -5,6 +5,8 @@ namespace SubProcess\Unit;
 use PHPUnit\Framework\TestCase;
 use SubProcess\Channel;
 
+use SubProcess\Unit\Assets\PrivatePropsObject;
+
 class ChannelTest extends TestCase
 {
     /** @var string */
@@ -49,6 +51,7 @@ class ChannelTest extends TestCase
             array( null ),
             array( array() ),
             array( array(1, 2, 3, 4, 5) ),
+            array( new PrivatePropsObject("John", 21) ),
             array( $this->text(1024 * 1232) )
         );
     }
