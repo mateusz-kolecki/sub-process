@@ -161,7 +161,7 @@ class ProcessTest extends TestCase
         $process->start();
 
         $messages = array();
-        while ($process->channel()->eof()) {
+        while (!$process->channel()->eof()) {
             list(, $messages[]) = $process->channel()->read();
         }
         $process->wait();

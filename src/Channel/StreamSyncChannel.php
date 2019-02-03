@@ -100,7 +100,7 @@ class StreamSyncChannel implements Channel
 
     public function eof()
     {
-        return $this->stream !== null && !feof($this->stream);
+        return $this->stream === null || feof($this->stream);
     }
 
     public function __destruct()
