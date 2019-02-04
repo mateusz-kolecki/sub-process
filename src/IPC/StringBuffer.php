@@ -31,4 +31,9 @@ class StringBuffer
             $this->buffer = \substr($this->buffer, 0, $offset) . \substr($this->buffer, $offset + $length);
         }
     }
+    
+    public function size()
+    {
+        return strlen($this->buffer);
+    }
 }
