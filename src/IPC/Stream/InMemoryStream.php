@@ -3,6 +3,7 @@
 namespace SubProcess\IPC\Stream;
 
 use SubProcess\IPC\Stream;
+use SubProcess\IPC\StringBuffer;
 
 /**
  * Use only for testing
@@ -13,21 +14,21 @@ class InMemoryStream implements Stream
     /** @var boolean */
     private $isOpen = true;
 
-    /** @var string */
+    /** @var StringBuffer */
     private $writeBuffer;
 
     /** @var string */
     private $readBuffer;
 
-    public function __construct(&$readBuffer, &$writeBuffer)
+    public function __construct(StringBuffer $readBuffer, StringBuffer $writeBuffer)
     {
-        $this->readBuffer = &$readBuffer;
-        $this->writeBuffer = &$writeBuffer;
+        $this->readBuffer = $readBuffer;
+        $this->writeBuffer = $writeBuffer;
     }
 
     public static function createLoop()
     {
-        $buffer = '';
+        $buffer = new StringBuffer();
         return new self($buffer, $buffer);
     }
 
@@ -37,8 +38,8 @@ class InMemoryStream implements Stream
             throw new \Exception();
         }
 
-        $data = \substr($this->readBuffer, 0, $length);
-        $this->readBuffer = \substr($this->readBuffer, \strlen($data));
+        $data = $this->readBuffer->read(0, $length);
+        $this->readBuffer->remove(0, $length);
 
         return $data;
     }
@@ -49,12 +50,12 @@ class InMemoryStream implements Stream
             throw new \Exception();
         }
 
-        $this->writeBuffer .= $data;
+        $this->writeBuffer->append($data);
     }
 
     public function eof()
     {
-        return $this->isOpen === false || 0 === \strlen($this->readBuffer);
+        return $this->isOpen === false || $this->readBuffer->size() === 0;
     }
 
     public function close()
