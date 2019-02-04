@@ -1,24 +1,20 @@
 <?php
 
-namespace SubProcess\Unit\Channel;
+namespace SubProcess\Unit\IPC\Channel;
 
 use PHPUnit\Framework\TestCase;
-use SubProcess\Channel\StreamSyncChannel;
+use SubProcess\IPC\Channel\SerialiseChannel;
+use SubProcess\IPC\Stream\InMemoryStream;
 use SubProcess\Unit\Assets\PrivatePropsObject;
 
-class StreamSyncChannelTest extends TestCase
+class SerialiseChannelTest extends TestCase
 {
-    /** @var string */
-    private $tmpFileName;
+    /** @var InMemoryStream */
+    private $stream;
 
     public function setUp()
     {
-        $this->tmpFileName = tempnam(__DIR__, 'tmp_channel');
-    }
-
-    public function tearDown()
-    {
-        unlink($this->tmpFileName);
+        $this->stream = InMemoryStream::createLoop();
     }
 
     private function text($length)
@@ -61,10 +57,10 @@ class StreamSyncChannelTest extends TestCase
      */
     public function sendingDataShouldWork($sendData)
     {
-        $channelA = new StreamSyncChannel(fopen($this->tmpFileName, 'w'));
+        $channelA = new SerialiseChannel($this->stream);
         $channelA->send($sendData);
 
-        $channelB = new StreamSyncChannel(fopen($this->tmpFileName, 'r'));
+        $channelB = new SerialiseChannel($this->stream);
         $receivedData = $channelB->read();
 
         $this->assertEquals($sendData, $receivedData);

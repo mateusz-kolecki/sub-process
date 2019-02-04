@@ -5,8 +5,8 @@ namespace SubProcess;
 use Iterator;
 use Exception;
 use LogicException;
-
-use SubProcess\Channel\StreamSyncChannel;
+use SubProcess\IPC\Channel\SerialiseChannel;
+use SubProcess\IPC\Stream\BlockingStream;
 
 class Process
 {
@@ -83,13 +83,13 @@ class Process
             $this->exitStatus = null;
 
             fclose($childSocket);
-            $this->channel = new StreamSyncChannel($parentSocket);
+            $this->channel = new SerialiseChannel(new BlockingStream($parentSocket));
             $this->pid = $pid;
         } else {
             $this->state = self::STATE_CHILD;
 
             fclose($parentSocket);
-            $this->channel = new StreamSyncChannel($childSocket);
+            $this->channel = new SerialiseChannel(new BlockingStream($childSocket));
             $this->pid = getmypid();
 
             try {

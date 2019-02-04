@@ -1,6 +1,6 @@
 <?php
 
-namespace SubProcess;
+namespace SubProcess\IPC;
 
 interface Channel
 {
