@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 class StringBufferTest extends TestCase
 {
     /** @test */
-    public function whenAppenThenBufferCollectData()
+    public function when_appen_then_buffer_collect_data()
     {
         $buffer = new \SubProcess\IPC\StringBuffer();
         
@@ -20,7 +20,7 @@ class StringBufferTest extends TestCase
     }
     
     /** @test */
-    public function whenAppenThenBufferSizeGrows()
+    public function when_appen_then_buffer_size_grows()
     {
         $buffer = new \SubProcess\IPC\StringBuffer();
         
@@ -47,7 +47,7 @@ class StringBufferTest extends TestCase
      * @test
      * @dataProvider bufferRemoveDataProvider
      */
-    public function whenRemoveThenBufferDataShrinks($offset, $length, $expectedString)
+    public function when_remove_then_buffer_data_shrinks($offset, $length, $expectedString)
     {
         $buffer = new \SubProcess\IPC\StringBuffer();       
         $buffer->append("Hello, World");
@@ -61,7 +61,7 @@ class StringBufferTest extends TestCase
      * @test
      * @dataProvider bufferRemoveDataProvider
      */
-    public function whenRemoveThenBufferSizeShrinks($offset, $length, $expectedString)
+    public function when_remove_then_buffer_size_shrinks($offset, $length, $expectedString)
     {
         $buffer = new \SubProcess\IPC\StringBuffer();       
         $buffer->append("Hello, World");
