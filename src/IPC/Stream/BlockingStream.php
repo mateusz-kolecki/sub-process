@@ -24,7 +24,7 @@ class BlockingStream implements Stream
         $buffer = new StringBuffer($data);
 
         while ($buffer->size() > 0) {
-            $packet = $buffer->read(0, min($buffer->size(), 8192));
+            $packet = $buffer->read(0, min($buffer->size(), 1024));
 
             $bytesSent = fwrite($this->fd, $packet);
 
@@ -45,7 +45,7 @@ class BlockingStream implements Stream
         $buffer = new StringBuffer();
 
         while ($buffer->size() < $length) {
-            $chunk = fread($this->fd, min($length, 8192));
+            $chunk = fread($this->fd, min($length, 1024));
 
             if ($chunk === false) {
                 throw new \Exception();
