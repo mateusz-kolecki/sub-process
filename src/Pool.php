@@ -3,7 +3,6 @@
 namespace SubProcess;
 
 use Countable;
-use SubProcess\PcntlWrapper\DebugWrapper;
 use SubProcess\PcntlWrapper\PoolWrapper;
 use SubProcess\PcntlWrapper\SimpleWrapper;
 
@@ -22,11 +21,7 @@ class Pool extends EventEmmiter implements Countable
     public function __construct($callback)
     {
         $this->callback = $callback;
-        $this->pcntl = new PoolWrapper(
-            new DebugWrapper(
-                new SimpleWrapper()
-            )
-        );
+        $this->pcntl = new PoolWrapper(new SimpleWrapper());
     }
 
     public function start($number)

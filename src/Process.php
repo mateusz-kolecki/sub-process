@@ -8,7 +8,6 @@ use LogicException;
 use SubProcess\IPC\Channel\SerialiseChannel;
 use SubProcess\IPC\Stream\BlockingStream;
 use SubProcess\PcntlWrapper\SimpleWrapper;
-use SubProcess\PcntlWrapper\DebugWrapper;
 
 class Process
 {
@@ -41,7 +40,7 @@ class Process
     public function __construct($callback)
     {
         $this->callback = $callback;
-        $this->pcntl = new DebugWrapper(new SimpleWrapper());
+        $this->pcntl = new SimpleWrapper();
     }
 
     /**
