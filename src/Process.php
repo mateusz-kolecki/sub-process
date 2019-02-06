@@ -8,6 +8,7 @@ use LogicException;
 use SubProcess\IPC\Channel\SerialiseChannel;
 use SubProcess\IPC\Stream\BlockingStream;
 use SubProcess\PcntlWrapper\SimpleWrapper;
+use SubProcess\PcntlWrapper\DebugWrapper;
 
 class Process
 {
@@ -40,7 +41,7 @@ class Process
     public function __construct($callback)
     {
         $this->callback = $callback;
-        $this->pcntl = new SimpleWrapper();
+        $this->pcntl = new DebugWrapper(new SimpleWrapper());
     }
 
     /**
@@ -183,7 +184,7 @@ class Process
         }
 
         if ($this->state === self::STATE_PARENT) {
-            $this->exitStatus = $this->pcntl->waitpid($this->pid);
+            $this->exitStatus = $this->pcntl->waitPid($this->pid);
 
             $this->state = self::STATE_EXITED;
             $this->pid = null;

@@ -3,11 +3,13 @@
 namespace SubProcess;
 
 use Countable;
+use SubProcess\PcntlWrapper\DebugWrapper;
 use SubProcess\PcntlWrapper\PoolWrapper;
 use SubProcess\PcntlWrapper\SimpleWrapper;
 
 class Pool extends EventEmmiter implements Countable
 {
+
     /** @var Process[] */
     private $processes = array();
 
@@ -20,7 +22,11 @@ class Pool extends EventEmmiter implements Countable
     public function __construct($callback)
     {
         $this->callback = $callback;
-        $this->pcntl = new PoolWrapper(new SimpleWrapper());
+        $this->pcntl = new PoolWrapper(
+            new DebugWrapper(
+                new SimpleWrapper()
+            )
+        );
     }
 
     public function start($number)
@@ -47,9 +53,7 @@ class Pool extends EventEmmiter implements Countable
         do {
             list($pid) = $this->pcntl->wait();
 
-            $worker = isset($this->processes[$pid])
-                ? $this->processes[$pid]
-                : null;
+            $worker = isset($this->processes[$pid]) ? $this->processes[$pid] : null;
 
             if ($worker) {
                 unset($this->processes[$pid]);
@@ -68,4 +72,5 @@ class Pool extends EventEmmiter implements Countable
     {
         return count($this->processes);
     }
+
 }
