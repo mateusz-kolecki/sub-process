@@ -3,6 +3,7 @@
 namespace SubProcess\IPC\Stream;
 
 use SubProcess\IPC\Stream;
+use SubProcess\IPC\StringBuffer;
 
 class BlockingStream implements Stream
 {
@@ -20,27 +21,18 @@ class BlockingStream implements Stream
             throw new \Exception("Tried to write to closed stream");
         }
 
-        $written = 0;
-        $length = strlen($data);
+        $buffer = new StringBuffer($data);
 
-        while ($written < $length) {
-            $packet = substr(
-                $data,
-                $written,
-                min($length - $written, 1024)
-            );
+        while ($buffer->size() > 0) {
+            $packet = $buffer->read(0, min($buffer->size(), 8192));
 
-            $fwrite = fwrite(
-                $this->fd,
-                $packet,
-                strlen($packet)
-            );
+            $bytesSent = fwrite($this->fd, $packet);
 
-            if ($fwrite === false) {
+            if ($bytesSent === false) {
                 throw new \Exception();
             }
 
-            $written += $fwrite;
+            $buffer->remove(0, $bytesSent);
         }
     }
 
@@ -50,22 +42,19 @@ class BlockingStream implements Stream
             throw new \Exception("Tried to read from closed stream");
         }
 
-        $buff = '';
+        $buffer = new StringBuffer();
 
-        while (strlen($buff) < $length) {
-            $fread = fread(
-                $this->fd,
-                min($length, 1024)
-            );
+        while ($buffer->size() < $length) {
+            $chunk = fread($this->fd, min($length, 8192));
 
-            if ($fread === false) {
+            if ($chunk === false) {
                 throw new \Exception();
             }
 
-            $buff .= $fread;
+            $buffer->append($chunk);
         }
 
-        return $buff;
+        return $buffer->read();
     }
 
     public function close()
