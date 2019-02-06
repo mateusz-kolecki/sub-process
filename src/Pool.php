@@ -3,23 +3,33 @@
 namespace SubProcess;
 
 use Countable;
+use SubProcess\PcntlWrapper\PoolWrapper;
+use SubProcess\PcntlWrapper\SimpleWrapper;
 
 class Pool extends EventEmmiter implements Countable
 {
+    /** @var Process[] */
     private $processes = array();
+
+    /** @var callable */
     private $callback;
+
+    /** @var PoolWrapper */
+    private $pcntl;
 
     public function __construct($callback)
     {
         $this->callback = $callback;
+        $this->pcntl = new PoolWrapper(new SimpleWrapper());
     }
 
     public function start($number)
     {
         for ($i = 0; $i < $number; $i++) {
-            $this->spawn(new Process(
-                $this->callback
-            ));
+            $process = new Process($this->callback);
+            $process->setPcntlWrapper($this->pcntl);
+
+            $this->spawn($process);
         }
     }
 
@@ -35,11 +45,7 @@ class Pool extends EventEmmiter implements Countable
     public function wait()
     {
         do {
-            $pid = pcntl_wait($status);
-
-            if ($pid === -1) {
-                throw new \Exception("Error on waiting for child proccess");
-            }
+            list($pid) = $this->pcntl->wait();
 
             $worker = isset($this->processes[$pid])
                 ? $this->processes[$pid]
@@ -51,6 +57,8 @@ class Pool extends EventEmmiter implements Countable
                 $exitInfo = $worker->wait();
                 $this->emit('exit', $exitInfo, $worker);
             }
+
+            $this->pcntl->removePidStatus($pid);
         } while ($worker === null);
 
         return $worker;

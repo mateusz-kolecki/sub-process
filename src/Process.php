@@ -2,11 +2,12 @@
 
 namespace SubProcess;
 
-use Iterator;
 use Exception;
+use Iterator;
 use LogicException;
 use SubProcess\IPC\Channel\SerialiseChannel;
 use SubProcess\IPC\Stream\BlockingStream;
+use SubProcess\PcntlWrapper\SimpleWrapper;
 
 class Process
 {
@@ -30,12 +31,26 @@ class Process
     /** @var ExitStatus|null */
     private $exitStatus = null;
 
+    /** @var PcntlWrapper */
+    private $pcntl;
+
     /**
      * @param callable $callback
      */
     public function __construct($callback)
     {
         $this->callback = $callback;
+        $this->pcntl = new SimpleWrapper();
+    }
+
+    /**
+     * Replace pcntl wrapper.
+     *
+     * @param PcntlWrapper $wrapper
+     */
+    public function setPcntlWrapper(PcntlWrapper $wrapper)
+    {
+        $this->pcntl = $wrapper;
     }
 
     /**
@@ -70,12 +85,12 @@ class Process
 
         list($parentSocket, $childSocket) = $this->socketPair();
 
-        $pid = pcntl_fork();
-
-        if ($pid === -1) {
+        try {
+            $pid = $this->pcntl->fork();
+        } catch (ForkError $e) {
             fclose($parentSocket);
             fclose($childSocket);
-            throw ForkError::fromPcntlErrno(pcntl_get_last_error());
+            throw $e;
         }
 
         if ($pid > 0) {
@@ -168,13 +183,11 @@ class Process
         }
 
         if ($this->state === self::STATE_PARENT) {
-            pcntl_waitpid($this->pid, $status);
+            $this->exitStatus = $this->pcntl->waitpid($this->pid);
 
             $this->state = self::STATE_EXITED;
             $this->pid = null;
             $this->channel()->close();
-
-            $this->exitStatus = ExitStatus::createFromPcntlStatus($status);
         }
 
         return $this->exitStatus;
