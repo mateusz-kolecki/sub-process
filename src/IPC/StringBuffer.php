@@ -5,25 +5,47 @@ namespace SubProcess\IPC;
 class StringBuffer
 {
     /** @var string */
-    private $buffer = '';
+    private $buffer;
 
+    /**
+     * @param string $data
+     */
+    public function __construct($data = '')
+    {
+        $this->buffer = $data;
+    }
+
+    /**
+     * @param string $data
+     */
     public function append($data)
     {
         $this->buffer .= $data;
     }
-    
-    public function read($offset, $length = null)
+
+    /**
+     * @param int $offset
+     * @param int|null $length
+     * @return string
+     */
+    public function read($offset = 0, $length = null)
     {
         if ($length === null) {
             $length = strlen($this->buffer) - $offset;
         }
-        
+
         return \substr($this->buffer, $offset, $length);
     }
-    
+
+    /**
+     * @param int $offset
+     * @param int|null $length
+     */
     public function remove($offset, $length)
     {
-        if ($offset === 0) {
+        if ($offset ===0 && $length === $this->size()) {
+            $this->buffer = '';
+        } elseif ($offset === 0) {
             $this->buffer = \substr($this->buffer, $length);
         } elseif ($offset + $length === strlen($this->buffer)) {
             $this->buffer = \substr($this->buffer, 0, $offset);
@@ -31,7 +53,10 @@ class StringBuffer
             $this->buffer = \substr($this->buffer, 0, $offset) . \substr($this->buffer, $offset + $length);
         }
     }
-    
+
+    /**
+     * @return int
+     */
     public function size()
     {
         return strlen($this->buffer);
