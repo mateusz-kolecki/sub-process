@@ -83,41 +83,38 @@ class Process
             throw ForkError::whenAlreadyStarted();
         }
 
-        list($parentSocket, $childSocket) = $this->socketPair();
+        list($parentChannel, $childChannel) = $this->createChannelPair();
 
-        try {
-            $pid = $this->pcntl->fork();
-        } catch (ForkError $e) {
-            fclose($parentSocket);
-            fclose($childSocket);
-            throw $e;
-        }
+        $pid = $this->pcntl->fork();
 
         if ($pid > 0) {
             $this->state = self::STATE_PARENT;
+
+            $childChannel->close();
+            $this->channel = $parentChannel;
             $this->exitStatus = null;
-
-            fclose($childSocket);
-            $this->channel = new SerialiseChannel(new BlockingStream($parentSocket));
             $this->pid = $pid;
-        } else {
-            $this->state = self::STATE_CHILD;
 
-            fclose($parentSocket);
-            $this->channel = new SerialiseChannel(new BlockingStream($childSocket));
-            $this->pid = getmypid();
-
-            try {
-                $returnValue = $this->runCallback();
-                $exitCode = $this->exitCode($returnValue);
-            } catch (Exception $e) {
-                $exitCode = $e->getCode() > 0 ? $e->getCode() : 1;
-            }
-
-            $this->channel->close();
-            $this->state = self::STATE_NOT_RUNNING;
-            exit($exitCode);
+            return;
         }
+
+        $this->state = self::STATE_CHILD;
+
+        $parentChannel->close();
+        $this->channel = $childChannel;
+        $this->pid = getmypid();
+
+        try {
+            $returnValue = $this->runCallback();
+            $exitCode = $this->exitCode($returnValue);
+        } catch (Exception $e) {
+            $exitCode = $e->getCode() > 0 ? $e->getCode() : 1;
+        }
+
+        $this->channel->close();
+        $this->state = self::STATE_NOT_RUNNING;
+        exit($exitCode);
+
     }
 
     private function runCallback()
@@ -140,7 +137,10 @@ class Process
         cli_set_process_title($name);
     }
 
-    private function socketPair()
+    /**
+     * @return Channel[]
+     */
+    private function createChannelPair()
     {
         $socketPair = stream_socket_pair(
             STREAM_PF_UNIX,
@@ -152,7 +152,10 @@ class Process
             throw ForkError::whenCannotOpenIpc();
         }
 
-        return $socketPair;
+        return array(
+            new SerialiseChannel(new BlockingStream($socketPair[0])),
+            new SerialiseChannel(new BlockingStream($socketPair[1])),
+        );
     }
 
     /**

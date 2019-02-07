@@ -4,7 +4,6 @@ namespace SubProcess\Unit;
 
 use ArrayIterator;
 use PHPUnit\Framework\TestCase;
-use SubProcess\Channel;
 use SubProcess\Process;
 
 class ProcessTest extends TestCase
