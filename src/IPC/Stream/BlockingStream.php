@@ -26,7 +26,7 @@ class BlockingStream implements Stream
         while ($buffer->size() > 0) {
             $packet = $buffer->read(0, min($buffer->size(), 1024));
 
-            $bytesSent = fwrite($this->fd, $packet);
+            $bytesSent = fwrite($this->fd, $packet, \strlen($packet));
 
             if ($bytesSent === false) {
                 throw new \Exception();
