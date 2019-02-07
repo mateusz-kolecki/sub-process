@@ -38,9 +38,8 @@ class SimpleWrapper implements PcntlWrapper
 
     function waitPid($pid)
     {
-        if (!is_int($pid) || $pid <=0) {
-            throw new \Exception("Cannot wait on pid that is {$pid}, must be > 0");
-        }
+        $status = null;
+
         if (pcntl_waitpid($pid, $status) === -1) {
             throw ForkError::fromPcntlErrno(
                 pcntl_get_last_error()
