@@ -13,6 +13,9 @@ matrix:
     - php: 5.3
       dist: precise
 
+  allow_failures:
+    - php: nightly
+
 cache:
   directories:
     - $HOME/.composer/cache
