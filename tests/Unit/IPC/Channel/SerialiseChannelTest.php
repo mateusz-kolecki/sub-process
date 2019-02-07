@@ -4,6 +4,7 @@ namespace SubProcess\Unit\IPC\Channel;
 
 use PHPUnit\Framework\TestCase;
 use SubProcess\IPC\Channel\SerialiseChannel;
+use SubProcess\IPC\Stream\BlockingStream;
 use SubProcess\IPC\Stream\InMemoryStream;
 use SubProcess\IPC\StringBuffer;
 use SubProcess\Unit\Assets\PrivatePropsObject;
@@ -50,41 +51,17 @@ class SerialiseChannelTest extends TestCase
      */
     public function when_sending_data_over_loop_stream_then_should_receive_equal_data($sendData)
     {
-        $stream = InMemoryStream::createLoop();
-        
+        $fd = fopen("php://memory", "rw");
+        $stream = new BlockingStream($fd);
+
         $channelA = new SerialiseChannel($stream);
         $channelA->send($sendData);
+
+        fseek($fd, 0);
 
         $channelB = new SerialiseChannel($stream);
         $receivedData = $channelB->read();
 
         $this->assertEquals($sendData, $receivedData);
-    }
-    
-    /**
-     * @test
-     * @dataProvider messageDataProvider
-     */
-    public function when_sending_data_over_stream_pair_then_other_end_should_receive_equal_data($sendData)
-    {
-        $redInbuffer = new StringBuffer();
-        $redOutbuffer = new StringBuffer();
-        $redStream = new InMemoryStream($redInbuffer, $redOutbuffer);
-        $redChannel = new SerialiseChannel($redStream);
-        
-        $greenInBuffer = $redOutbuffer;
-        $greenOutBuffer = $redInbuffer;
-        $greenStream = new InMemoryStream($greenInBuffer, $greenOutBuffer);
-        $greenChannel = new SerialiseChannel($greenStream);
-        
-        
-        $redChannel->send($sendData);
-        $greenChannel->send($sendData);
-        
-        $redReceivedData = $redChannel->read();
-        $greenReceivedData = $greenChannel->read();
-
-        $this->assertEquals($sendData, $redReceivedData);
-        $this->assertEquals($sendData, $greenReceivedData);
     }
 }
