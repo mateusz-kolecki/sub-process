@@ -44,6 +44,11 @@ class SerialiseChannel implements Channel
         );
     }
 
+    function stream()
+    {
+        return $this->stream;
+    }
+
     public function close()
     {
         $this->stream->close();

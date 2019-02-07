@@ -16,6 +16,11 @@ interface Channel
     public function read();
 
     /**
+     * @return Stream
+     */
+    public function stream();
+
+    /**
      * @return void
      */
     public function close();

@@ -8,4 +8,5 @@ interface Stream
     public function write($data);
     public function eof();
     public function close();
+    public function resource();
 }

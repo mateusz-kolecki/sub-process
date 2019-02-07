@@ -75,6 +75,11 @@ class BlockingStream implements Stream
         return $this->fd === null || feof($this->fd);
     }
 
+    public function resource()
+    {
+        return $this->fd;
+    }
+
     public function __destruct()
     {
         if ($this->fd !== null) {
