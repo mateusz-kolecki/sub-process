@@ -40,7 +40,10 @@ class PoolWrapper implements PcntlWrapper
     public function waitPid($pid)
     {
         if (isset($this->pidStatuses[$pid])) {
-            return $this->pidStatuses[$pid];
+            $status = $this->pidStatuses[$pid];
+            $this->removePidStatus($pid);
+            
+            return $status;
         }
 
         return $this->wrapper->waitPid($pid);

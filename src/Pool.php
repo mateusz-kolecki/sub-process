@@ -27,17 +27,26 @@ class Pool extends EventEmmiter implements Countable
     public function start($number)
     {
         for ($i = 0; $i < $number; $i++) {
-            $process = new Process($this->callback);
-            $process->setPcntlWrapper($this->pcntl);
-
-            $this->spawn($process);
+            $this->spawn(new Process($this->callback));
         }
     }
 
     public function spawn(Process $worker)
     {
+        $worker->setPcntlWrapper($this->pcntl);
         $worker->start();
+
         $this->processes[$worker->pid()] = $worker;
+    }
+
+    private function getChildByPid($pid)
+    {
+        return isset($this->processes[$pid]) ? $this->processes[$pid] : null;
+    }
+
+    private function removeChildByPid($pid)
+    {
+        unset($this->processes[$pid]);
     }
 
     /**
@@ -48,16 +57,13 @@ class Pool extends EventEmmiter implements Countable
         do {
             list($pid) = $this->pcntl->wait();
 
-            $worker = isset($this->processes[$pid]) ? $this->processes[$pid] : null;
+            $worker = $this->getChildByPid($pid);
 
             if ($worker) {
-                unset($this->processes[$pid]);
-
+                $this->removeChildByPid($pid);
                 $exitInfo = $worker->wait();
                 $this->emit('exit', $exitInfo, $worker);
             }
-
-            $this->pcntl->removePidStatus($pid);
         } while ($worker === null);
 
         return $worker;
