@@ -6,6 +6,7 @@ use Exception;
 use Iterator;
 use LogicException;
 use SubProcess\IPC\Channel\SerialiseChannel;
+use SubProcess\IPC\Channel;
 use SubProcess\IPC\Stream\BlockingStream;
 use SubProcess\PcntlWrapper\SimpleWrapper;
 
