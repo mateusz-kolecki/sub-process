@@ -7,7 +7,7 @@ use Iterator;
 use LogicException;
 use SubProcess\IPC\Channel\SerialiseChannel;
 use SubProcess\IPC\Channel;
-use SubProcess\IPC\Stream\BlockingStream;
+use SubProcess\IPC\Stream\ResourceStream;
 use SubProcess\PcntlWrapper\SimpleWrapper;
 
 class Process
@@ -154,8 +154,8 @@ class Process
         }
 
         return array(
-            new SerialiseChannel(new BlockingStream($socketPair[0])),
-            new SerialiseChannel(new BlockingStream($socketPair[1])),
+            new SerialiseChannel(new ResourceStream($socketPair[0])),
+            new SerialiseChannel(new ResourceStream($socketPair[1])),
         );
     }
 

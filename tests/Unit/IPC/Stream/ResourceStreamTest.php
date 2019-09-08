@@ -3,26 +3,33 @@
 namespace SubProcess\Unit\IPC\Stream;
 
 use PHPUnit\Framework\TestCase;
-use SubProcess\IPC\Stream\BlockingStream;
+use SubProcess\IPC\Stream\ResourceStream;
 
-class BlockingStreamTest extends TestCase
+class ResourceStreamTest extends TestCase
 {
     /** @var resource */
     private $fd;
 
-    /** @var BlockingStream */
+    /** @var ResourceStream */
     private $stream;
 
 
     public function setUp()
     {
         $this->fd = \fopen("php://memory", "rw");
-        $this->stream = new BlockingStream($this->fd);
+        $this->stream = new ResourceStream($this->fd);
     }
 
     protected function tearDown()
     {
         $this->stream->close();
+    }
+
+    /** @test */
+    public function when_created_with_not_resource_then_throw_error()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        new ResourceStream(array());
     }
 
     /** @test */

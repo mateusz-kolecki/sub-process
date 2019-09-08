@@ -4,7 +4,7 @@ namespace SubProcess\Unit\IPC\Channel;
 
 use PHPUnit\Framework\TestCase;
 use SubProcess\IPC\Channel\SerialiseChannel;
-use SubProcess\IPC\Stream\BlockingStream;
+use SubProcess\IPC\Stream\ResourceStream;
 use SubProcess\IPC\Stream\InMemoryStream;
 use SubProcess\IPC\StringBuffer;
 use SubProcess\Unit\Assets\PrivatePropsObject;
@@ -52,7 +52,7 @@ class SerialiseChannelTest extends TestCase
     public function when_sending_data_over_loop_stream_then_should_receive_equal_data($sendData)
     {
         $fd = fopen("php://memory", "rw");
-        $stream = new BlockingStream($fd);
+        $stream = new ResourceStream($fd);
 
         $channelA = new SerialiseChannel($stream);
         $channelA->send($sendData);

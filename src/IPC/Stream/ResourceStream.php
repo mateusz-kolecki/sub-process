@@ -5,19 +5,27 @@ namespace SubProcess\IPC\Stream;
 use SubProcess\IPC\Stream;
 use SubProcess\IPC\StringBuffer;
 
-class BlockingStream implements Stream
+class ResourceStream implements Stream
 {
     /** @var resource */
-    private $fd;
+    private $resource;
 
-    public function __construct($fd)
+    /**
+     * @param resource $resource
+     */
+    public function __construct($resource)
     {
-        $this->fd = $fd;
+        if (!is_resource($resource)) {
+            $type = is_object($resource) ? get_class($resource) : gettype($resource);
+            throw new \InvalidArgumentException("Resource expected but {$type} given");
+        }
+
+        $this->resource = $resource;
     }
 
     public function write($data)
     {
-        if ($this->fd === null) {
+        if ($this->resource === null) {
             throw new \Exception("Tried to write to closed stream");
         }
 
@@ -26,7 +34,7 @@ class BlockingStream implements Stream
         while ($buffer->size() > 0) {
             $packet = $buffer->read(0, min($buffer->size(), 1024));
 
-            $bytesSent = fwrite($this->fd, $packet, \strlen($packet));
+            $bytesSent = fwrite($this->resource, $packet, \strlen($packet));
 
             if ($bytesSent === false) {
                 throw new \Exception();
@@ -38,14 +46,14 @@ class BlockingStream implements Stream
 
     public function read($length)
     {
-        if ($this->fd === null) {
+        if ($this->resource === null) {
             throw new \Exception("Tried to read from closed stream");
         }
 
         $buffer = new StringBuffer();
 
         while ($buffer->size() < $length) {
-            $chunk = fread($this->fd, min($length, 1024));
+            $chunk = fread($this->resource, min($length, 1024));
 
             if ($chunk === false) {
                 throw new \Exception();
@@ -59,30 +67,30 @@ class BlockingStream implements Stream
 
     public function close()
     {
-        if ($this->fd === null) {
+        if ($this->resource === null) {
             return;
         }
 
-        if (!@fclose($this->fd)) {
+        if (!@fclose($this->resource)) {
             throw new \Exception("Could not close stream");
         }
 
-        $this->fd = null;
+        $this->resource = null;
     }
 
     public function eof()
     {
-        return $this->fd === null || feof($this->fd);
+        return $this->resource === null || feof($this->resource);
     }
 
     public function resource()
     {
-        return $this->fd;
+        return $this->resource;
     }
 
     public function __destruct()
     {
-        if ($this->fd === null) {
+        if ($this->resource === null) {
             return;
         }
 
