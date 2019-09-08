@@ -82,8 +82,14 @@ class BlockingStream implements Stream
 
     public function __destruct()
     {
-        if ($this->fd !== null) {
+        if ($this->fd === null) {
+            return;
+        }
+
+        try {
             $this->close();
+        } catch (\Exception $e) {
+            // noop
         }
     }
 }
