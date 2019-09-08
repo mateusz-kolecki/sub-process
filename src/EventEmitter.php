@@ -2,7 +2,7 @@
 
 namespace SubProcess;
 
-class EventEmmiter
+class EventEmitter
 {
     private $eventHandlers = array();
 

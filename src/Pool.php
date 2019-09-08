@@ -7,7 +7,7 @@ use InvalidArgumentException;
 use SubProcess\PcntlWrapper\PoolWrapper;
 use SubProcess\PcntlWrapper\SimpleWrapper;
 
-class Pool extends EventEmmiter implements Countable
+class Pool extends EventEmitter implements Countable
 {
 
     /** @var Process[] */
