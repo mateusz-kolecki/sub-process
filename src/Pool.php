@@ -3,6 +3,7 @@
 namespace SubProcess;
 
 use Countable;
+use InvalidArgumentException;
 use SubProcess\PcntlWrapper\PoolWrapper;
 use SubProcess\PcntlWrapper\SimpleWrapper;
 
@@ -18,8 +19,17 @@ class Pool extends EventEmmiter implements Countable
     /** @var PoolWrapper */
     private $pcntl;
 
+    /**
+     * @param callable $callback
+     * @throws InvalidArgumentException
+     */
     public function __construct($callback)
     {
+        if (!is_callable($callback)) {
+            $type = is_object($callback) ? get_class($callback) : gettype($callback);
+            throw new InvalidArgumentException("Callback must be callable but {$type} given");
+        }
+
         $this->callback = $callback;
         $this->pcntl = new PoolWrapper(new SimpleWrapper());
     }
