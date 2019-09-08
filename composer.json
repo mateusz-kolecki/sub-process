@@ -1,5 +1,6 @@
 {
     "name": "mkolecki/sub-process",
+    "description": "Library for creating new processes for PHP",
     "type": "library",
     "license": "MIT",
     "authors": [
