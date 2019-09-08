@@ -21,10 +21,10 @@ class SerialiseChannel implements Channel
             throw new \Exception("Trying to send over closed channel");
         }
 
-        $string = serialize($data);
+        $string = \serialize($data);
 
         // first send unsigned long with lenght of serialized data
-        $this->stream->write(pack("L", strlen($string)));
+        $this->stream->write(\pack("L", \strlen($string)));
         // then send data
         $this->stream->write($string);
     }
@@ -36,10 +36,10 @@ class SerialiseChannel implements Channel
         }
 
         // first read unsigned long as lenght of serialized data
-        $length = unpack("Llong", $this->stream->read(4));
+        $length = \unpack("Llong", $this->stream->read(4));
 
         // then read serialized data with that length
-        return unserialize(
+        return \unserialize(
             $this->stream->read($length['long'])
         );
     }

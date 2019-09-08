@@ -63,11 +63,11 @@ class Process
             return 0;
         }
 
-        if (is_int($returnValue)) {
+        if (\is_int($returnValue)) {
             return $returnValue;
         }
 
-        if (is_numeric($returnValue)) {
+        if (\is_numeric($returnValue)) {
             return (int) $returnValue;
         }
 
@@ -103,7 +103,7 @@ class Process
 
         $parentChannel->close();
         $this->channel = $childChannel;
-        $this->pid = getmypid();
+        $this->pid = \getmypid();
 
         try {
             $returnValue = $this->runCallback();
@@ -120,7 +120,7 @@ class Process
 
     private function runCallback()
     {
-        $result = call_user_func($this->callback, $this);
+        $result = \call_user_func($this->callback, $this);
 
         if (!($result instanceof Iterator)) {
             return $result;
@@ -135,7 +135,7 @@ class Process
 
     public function setName($name)
     {
-        cli_set_process_title($name);
+        \cli_set_process_title($name);
     }
 
     /**
@@ -143,7 +143,7 @@ class Process
      */
     private function createChannelPair()
     {
-        $socketPair = stream_socket_pair(
+        $socketPair = \stream_socket_pair(
             STREAM_PF_UNIX,
             STREAM_SOCK_STREAM,
             0

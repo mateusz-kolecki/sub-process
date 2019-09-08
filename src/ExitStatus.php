@@ -19,10 +19,10 @@ class ExitStatus
 
     public static function createFromPcntlStatus($status)
     {
-        $normalExit = pcntl_wifexited($status);
-        $code = $normalExit ? pcntl_wexitstatus($status) : null;
-        $signaledExit = pcntl_wifsignaled($status);
-        $termSignal = $signaledExit ? pcntl_wtermsig($status) : null;
+        $normalExit = \pcntl_wifexited($status);
+        $code = $normalExit ? \pcntl_wexitstatus($status) : null;
+        $signaledExit = \pcntl_wifsignaled($status);
+        $termSignal = $signaledExit ? \pcntl_wtermsig($status) : null;
 
         return new self(
             $normalExit,

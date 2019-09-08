@@ -11,11 +11,11 @@ class SimpleWrapper implements PcntlWrapper
 
     public function fork()
     {
-        $result = pcntl_fork();
+        $result = \pcntl_fork();
 
         if ($result === -1) {
             throw ForkError::fromPcntlErrno(
-                pcntl_get_last_error()
+                \pcntl_get_last_error()
             );
         }
 
@@ -25,11 +25,11 @@ class SimpleWrapper implements PcntlWrapper
     public function wait()
     {
         $status = null;
-        $pid = pcntl_wait($status);
+        $pid = \pcntl_wait($status);
 
         if ($pid === -1) {
             throw ForkError::fromPcntlErrno(
-                pcntl_get_last_error()
+                \pcntl_get_last_error()
             );
         }
 
@@ -40,9 +40,9 @@ class SimpleWrapper implements PcntlWrapper
     {
         $status = null;
 
-        if (pcntl_waitpid($pid, $status) === -1) {
+        if (\pcntl_waitpid($pid, $status) === -1) {
             throw ForkError::fromPcntlErrno(
-                pcntl_get_last_error()
+                \pcntl_get_last_error()
             );
         }
 

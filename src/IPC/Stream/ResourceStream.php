@@ -15,8 +15,8 @@ class ResourceStream implements Stream
      */
     public function __construct($resource)
     {
-        if (!is_resource($resource)) {
-            $type = is_object($resource) ? get_class($resource) : gettype($resource);
+        if (!\is_resource($resource)) {
+            $type = \is_object($resource) ? \get_class($resource) : \gettype($resource);
             throw new \InvalidArgumentException("Resource expected but {$type} given");
         }
 
@@ -34,7 +34,7 @@ class ResourceStream implements Stream
         while ($buffer->size() > 0) {
             $packet = $buffer->read(0, min($buffer->size(), 1024));
 
-            $bytesSent = fwrite($this->resource, $packet, \strlen($packet));
+            $bytesSent = \fwrite($this->resource, $packet, \strlen($packet));
 
             if ($bytesSent === false) {
                 throw new \Exception();
@@ -53,7 +53,7 @@ class ResourceStream implements Stream
         $buffer = new StringBuffer();
 
         while ($buffer->size() < $length) {
-            $chunk = fread($this->resource, min($length, 1024));
+            $chunk = \fread($this->resource, \min($length, 1024));
 
             if ($chunk === false) {
                 throw new \Exception();
@@ -80,7 +80,7 @@ class ResourceStream implements Stream
 
     public function eof()
     {
-        return $this->resource === null || feof($this->resource);
+        return $this->resource === null || \feof($this->resource);
     }
 
     public function resource()

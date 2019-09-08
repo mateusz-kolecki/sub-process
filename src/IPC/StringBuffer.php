@@ -31,7 +31,7 @@ class StringBuffer
     public function read($offset = 0, $length = null)
     {
         if ($length === null) {
-            $length = strlen($this->buffer) - $offset;
+            $length = \strlen($this->buffer) - $offset;
         }
 
         return \substr($this->buffer, $offset, $length);
@@ -59,6 +59,6 @@ class StringBuffer
      */
     public function size()
     {
-        return strlen($this->buffer);
+        return \strlen($this->buffer);
     }
 }

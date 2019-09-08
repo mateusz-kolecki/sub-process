@@ -26,7 +26,7 @@ class Pool extends EventEmmiter implements Countable
     public function __construct($callback)
     {
         if (!is_callable($callback)) {
-            $type = is_object($callback) ? get_class($callback) : gettype($callback);
+            $type = \is_object($callback) ? \get_class($callback) : \gettype($callback);
             throw new InvalidArgumentException("Callback must be callable but {$type} given");
         }
 

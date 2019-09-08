@@ -17,14 +17,14 @@ class EventEmmiter
 
     public function emit($eventName/*, ...$args */)
     {
-        $args = array_slice(func_get_args(), 1);
+        $args = \array_slice(\func_get_args(), 1);
 
         if (empty($this->eventHandlers[$eventName])) {
             return;
         }
 
         foreach ($this->eventHandlers[$eventName] as $callback) {
-            call_user_func_array($callback, $args);
+            \call_user_func_array($callback, $args);
         }
     }
 }

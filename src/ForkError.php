@@ -10,7 +10,7 @@ class ForkError extends \Exception
     }
     public static function fromPcntlErrno($errno)
     {
-        return new self(pcntl_strerror($errno));
+        return new self(\pcntl_strerror($errno));
     }
 
     /** @return self */
