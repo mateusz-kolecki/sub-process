@@ -2,7 +2,6 @@
 
 namespace SubProcess;
 
-use Exception;
 use SubProcess\Guards\TypeGuard;
 use SubProcess\IPC\Channel;
 
