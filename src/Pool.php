@@ -3,12 +3,13 @@
 namespace SubProcess;
 
 use Countable;
+use Evenement\EventEmitter2;
 use InvalidArgumentException;
 use SubProcess\Guards\TypeGuard;
 use SubProcess\Pcntl\ExitStatusCacheDecorator;
 use SubProcess\Pcntl\RealPcntl;
 
-class Pool extends EventEmitter implements Countable
+class Pool extends EventEmitter2 implements Countable
 {
     /** @var Process[] */
     private $processes = array();
@@ -28,6 +29,8 @@ class Pool extends EventEmitter implements Countable
         Pcntl $pcntl
     ) {
         TypeGuard::assertCallable($callback);
+
+        parent::__construct();
 
         $this->callback = $callback;
         $this->pcntl = new ExitStatusCacheDecorator($pcntl);
@@ -88,7 +91,7 @@ class Pool extends EventEmitter implements Countable
                 $worker->wait();
                 $this->pcntl->removeStatus($pid);
 
-                $this->emit('exit', $exitStatus, $worker);
+                $this->emit('exit', array($exitStatus, $worker));
             }
 
         } while ($worker === null);
