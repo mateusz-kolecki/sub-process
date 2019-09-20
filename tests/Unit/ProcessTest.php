@@ -141,30 +141,4 @@ class ProcessTest extends TestCase
         $this->assertInternalType('integer', $pid);
         $this->assertSame($message, $pid);
     }
-
-    /** @test */
-    public function when_iterator_is_returned_then_all_element_are_send_over_channel()
-    {
-        $process = new Process(function () {
-            // In PHP >= 5.5.0 you can use Generator which is also Iterator
-            /*
-            yield 'Hello From Child';
-
-            for ($count = 0; $count < 3; $count++) {
-                yield $count;
-            }
-            */
-            return new ArrayIterator(array('Hello From Child', 0, 1, 2));
-        });
-
-        $process->start();
-
-        $messages = array();
-        while (!$process->channel()->eof()) {
-            list(, $messages[]) = $process->channel()->read();
-        }
-        $process->wait();
-
-        $this->assertEquals(array("Hello From Child", 0, 1, 2), $messages);
-    }
 }

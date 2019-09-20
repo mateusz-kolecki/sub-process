@@ -104,7 +104,7 @@ class Process
         $this->pid = \getmypid();
 
         try {
-            $returnValue = $this->runCallback();
+            $returnValue = \call_user_func($this->callback, $this);
             $exitCode = $this->exitCode($returnValue);
         } catch (Exception $e) {
             $exitCode = $e->getCode() > 0 ? $e->getCode() : 1;
@@ -113,21 +113,6 @@ class Process
         $this->channel->close();
         $this->state = self::STATE_NOT_RUNNING;
         exit($exitCode);
-    }
-
-    private function runCallback()
-    {
-        $result = \call_user_func($this->callback, $this);
-
-        if (!($result instanceof Iterator)) {
-            return $result;
-        }
-
-        foreach ($result as $key => $value) {
-            $this->channel->send(array($key, $value));
-        }
-
-        return 0;
     }
 
     public function setName($name)
