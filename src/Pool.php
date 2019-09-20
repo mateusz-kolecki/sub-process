@@ -70,6 +70,7 @@ class Pool extends EventEmitter implements Countable
 
     /**
      * @return Process
+     * @throws ForkError
      */
     public function wait()
     {
@@ -99,5 +100,4 @@ class Pool extends EventEmitter implements Countable
     {
         return count($this->processes);
     }
-
 }

@@ -3,6 +3,7 @@
 namespace SubProcess;
 
 use Exception;
+use InvalidArgumentException;
 use LogicException;
 use SubProcess\Guards\TypeGuard;
 use SubProcess\IPC\Channel;
@@ -37,6 +38,7 @@ final class Process
     /**
      * @param callable $callback
      * @param Pcntl|null $pcntl
+     * @throws InvalidArgumentException
      */
     public function __construct($callback, Pcntl $pcntl = null)
     {
@@ -47,6 +49,7 @@ final class Process
     }
 
     /**
+     * @return void
      * @throws ForkError
      */
     public function start()
@@ -147,7 +150,7 @@ final class Process
 
     /**
      * @return ExitStatus
-     * @var ExitStatus
+     * @throws LogicException
      */
     public function exitStatus()
     {
