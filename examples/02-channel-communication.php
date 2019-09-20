@@ -1,9 +1,10 @@
 <?php
 include __DIR__ . '/../vendor/autoload.php';
 
+use SubProcess\Child;
 use SubProcess\Process;
 
-$process = new Process(function (Process $child) {
+$process = new Process(function (Child $child) {
     $channel = $child->channel();
 
     $channel->send("Hello from child process!");
