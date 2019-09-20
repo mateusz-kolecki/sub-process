@@ -2,6 +2,7 @@
 
 namespace SubProcess\IPC\Stream;
 
+use SubProcess\Guards\TypeGuard;
 use SubProcess\IPC\Stream;
 use SubProcess\IPC\StringBuffer;
 
@@ -15,16 +16,18 @@ class ResourceStream implements Stream
      */
     public function __construct($resource)
     {
-        if (!\is_resource($resource)) {
-            $type = \is_object($resource) ? \get_class($resource) : \gettype($resource);
-            throw new \InvalidArgumentException("Resource expected but {$type} given");
-        }
+        TypeGuard::assertResource($resource);
 
         $this->resource = $resource;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function write($data)
     {
+        TypeGuard::assertString($data);
+
         if ($this->resource === null) {
             throw new \Exception("Tried to write to closed stream");
         }
@@ -44,8 +47,13 @@ class ResourceStream implements Stream
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function read($length)
     {
+        TypeGuard::assertInt($length);
+
         if ($this->resource === null) {
             throw new \Exception("Tried to read from closed stream");
         }

@@ -4,59 +4,68 @@ namespace SubProcess;
 
 use Countable;
 use InvalidArgumentException;
-use SubProcess\PcntlWrapper\PoolWrapper;
-use SubProcess\PcntlWrapper\SimpleWrapper;
+use SubProcess\Guards\TypeGuard;
+use SubProcess\Pcntl\ExitStatusCacheDecorator;
+use SubProcess\Pcntl\RealPcntl;
 
 class Pool extends EventEmitter implements Countable
 {
-
     /** @var Process[] */
     private $processes = array();
 
     /** @var callable */
     private $callback;
 
-    /** @var PoolWrapper */
+    /** @var ExitStatusCacheDecorator */
     private $pcntl;
 
     /**
      * @param callable $callback
-     * @throws InvalidArgumentException
+     * @param Pcntl $pcntl
      */
-    public function __construct($callback)
-    {
-        if (!is_callable($callback)) {
-            $type = \is_object($callback) ? \get_class($callback) : \gettype($callback);
-            throw new InvalidArgumentException("Callback must be callable but {$type} given");
-        }
+    public function __construct(
+        $callback,
+        Pcntl $pcntl
+    ) {
+        TypeGuard::assertCallable($callback);
 
         $this->callback = $callback;
-        $this->pcntl = new PoolWrapper(new SimpleWrapper());
+        $this->pcntl = new ExitStatusCacheDecorator($pcntl);
     }
 
+    /**
+     * @param callable $callback
+     * @return self
+     */
+    public static function create($callback)
+    {
+        return new self(
+            $callback,
+            new RealPcntl()
+        );
+    }
+
+    /**
+     * @param int $number
+     * @throws ForkError
+     */
     public function start($number)
     {
-        for ($i = 0; $i < $number; $i++) {
-            $this->spawn(new Process($this->callback));
+        TypeGuard::assertInt($number);
+
+        if ($number <= 0) {
+            throw new InvalidArgumentException("Requested workers number must be greater than zero");
         }
-    }
 
-    public function spawn(Process $worker)
-    {
-        $worker->setPcntlWrapper($this->pcntl);
-        $worker->start();
+        for ($i = 0; $i < $number; $i++) {
+            $worker = new Process(
+                $this->callback,
+                $this->pcntl
+            );
 
-        $this->processes[$worker->pid()] = $worker;
-    }
-
-    private function getChildByPid($pid)
-    {
-        return isset($this->processes[$pid]) ? $this->processes[$pid] : null;
-    }
-
-    private function removeChildByPid($pid)
-    {
-        unset($this->processes[$pid]);
+            $worker->start();
+            $this->processes[$worker->pid()] = $worker;
+        }
     }
 
     /**
@@ -65,15 +74,22 @@ class Pool extends EventEmitter implements Countable
     public function wait()
     {
         do {
-            list($pid) = $this->pcntl->wait();
+            $exitStatus = $this->pcntl->wait();
+            $pid = $exitStatus->pid();
 
-            $worker = $this->getChildByPid($pid);
+            $worker = isset($this->processes[$pid])
+                ? $this->processes[$pid]
+                : null;
 
-            if ($worker) {
-                $this->removeChildByPid($pid);
-                $exitInfo = $worker->wait();
-                $this->emit('exit', $exitInfo, $worker);
+            // when null then process was not managed by this pool
+            if ($worker !== null) {
+                unset($this->processes[$pid]);
+                $worker->wait();
+                $this->pcntl->removeStatus($pid);
+
+                $this->emit('exit', $exitStatus, $worker);
             }
+
         } while ($worker === null);
 
         return $worker;

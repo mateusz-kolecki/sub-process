@@ -2,28 +2,43 @@
 
 namespace SubProcess;
 
+use SubProcess\Guards\TypeGuard;
+
 class EventEmitter
 {
-    private $eventHandlers = array();
+    /** @var callable[][] */
+    private $handlers = array();
 
+    /**
+     * @param string $eventName
+     * @param callable $callback
+     */
     public function on($eventName, $callback)
     {
-        if (!isset($this->eventHandlers[$eventName])) {
-            $this->eventHandlers[$eventName] = array();
+        TypeGuard::assertString($eventName);
+        TypeGuard::assertCallable($callback);
+
+        if (!isset($this->handlers[$eventName])) {
+            $this->handlers[$eventName] = array();
         }
 
-        $this->eventHandlers[$eventName][] = $callback;
+        $this->handlers[$eventName][] = $callback;
     }
 
+    /**
+     * @param string $eventName
+     */
     public function emit($eventName/*, ...$args */)
     {
+        TypeGuard::assertString($eventName);
+
         $args = \array_slice(\func_get_args(), 1);
 
-        if (empty($this->eventHandlers[$eventName])) {
+        if (empty($this->handlers[$eventName])) {
             return;
         }
 
-        foreach ($this->eventHandlers[$eventName] as $callback) {
+        foreach ($this->handlers[$eventName] as $callback) {
             \call_user_func_array($callback, $args);
         }
     }

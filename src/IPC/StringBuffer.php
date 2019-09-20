@@ -2,6 +2,8 @@
 
 namespace SubProcess\IPC;
 
+use SubProcess\Guards\TypeGuard;
+
 class StringBuffer
 {
     /** @var string */
@@ -12,6 +14,7 @@ class StringBuffer
      */
     public function __construct($data = '')
     {
+        TypeGuard::assertString($data);
         $this->buffer = $data;
     }
 
@@ -20,6 +23,7 @@ class StringBuffer
      */
     public function append($data)
     {
+        TypeGuard::assertString($data);
         $this->buffer .= $data;
     }
 
@@ -30,6 +34,9 @@ class StringBuffer
      */
     public function read($offset = 0, $length = null)
     {
+        TypeGuard::assertInt($offset);
+        TypeGuard::assertIntNullable($length);
+
         if ($length === null) {
             $length = \strlen($this->buffer) - $offset;
         }
@@ -39,10 +46,13 @@ class StringBuffer
 
     /**
      * @param int $offset
-     * @param int|null $length
+     * @param int $length
      */
     public function remove($offset, $length)
     {
+        TypeGuard::assertInt($offset);
+        TypeGuard::assertInt($length);
+
         if ($offset ===0 && $length === $this->size()) {
             $this->buffer = '';
         } elseif ($offset === 0) {

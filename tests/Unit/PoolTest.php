@@ -15,14 +15,14 @@ class PoolTest extends TestCase
     {
         $this->setExpectedException('InvalidArgumentException');
 
-        new Pool(array());
+        Pool::create(array());
     }
 
 
     /** @test */
     public function when_child_exit_then_wait_return_exited_process()
     {
-        $pool = new Pool(function () {
+        $pool = Pool::create(function () {
             // noop
         });
 
@@ -36,7 +36,7 @@ class PoolTest extends TestCase
     /** @test */
     public function when_child_exit_then_emit_exit_event()
     {
-        $pool = new Pool(function () {
+        $pool = Pool::create(function () {
             // noop
         });
 
@@ -58,7 +58,7 @@ class PoolTest extends TestCase
     /** @test */
     public function when_child_exit_then_pool_count_decrease()
     {
-        $pool = new Pool(function () {
+        $pool = Pool::create(function () {
             // noop
         });
 
@@ -75,25 +75,26 @@ class PoolTest extends TestCase
     /** @test */
     public function when_callback_do_not_fail_then_all_workers_exit_successfully()
     {
-        $pool = new Pool(function () {
+        // given
+        $pool = Pool::create(function () {
             // noop
         });
 
-        $exitStatusess = array();
-        $pool->on('exit', function (ExitStatus $status) use (&$exitStatusess) {
-            $exitStatusess[] = $status;
-        });
-
+        // when
         $pool->start(5);
+
+        // then
+
+        $exitStatuses = array();
         while ($pool->count()) {
-            $pool->wait();
+            $exitStatuses[] = $pool->wait()->exitStatus();
         }
 
-        $this->assertCount(5, $exitStatusess);
+        $this->assertCount(5, $exitStatuses);
 
-        $expectedInfo = new ExitStatus(true, 0, false, null);
-        foreach ($exitStatusess as $info) {
-            $this->assertEquals($expectedInfo, $info);
+        foreach ($exitStatuses as $info) {
+            $this->assertTrue($info->normalExit());
+            $this->assertEquals(0, $info->code());
         }
     }
 }

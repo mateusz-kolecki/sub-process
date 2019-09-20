@@ -2,8 +2,8 @@
 
 namespace SubProcess\IPC\Channel;
 
-use SubProcess\IPC\Stream;
 use SubProcess\IPC\Channel;
+use SubProcess\IPC\Stream;
 
 class SerialiseChannel implements Channel
 {
@@ -15,6 +15,9 @@ class SerialiseChannel implements Channel
         $this->stream = $stream;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function send($data)
     {
         if ($this->stream === null) {
@@ -29,6 +32,9 @@ class SerialiseChannel implements Channel
         $this->stream->write($string);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function read()
     {
         if ($this->stream === null) {
@@ -44,16 +50,25 @@ class SerialiseChannel implements Channel
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     function stream()
     {
         return $this->stream;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function close()
     {
         $this->stream->close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function eof()
     {
         return $this->stream->eof();

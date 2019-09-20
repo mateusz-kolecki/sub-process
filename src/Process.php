@@ -5,10 +5,11 @@ namespace SubProcess;
 use Exception;
 use Iterator;
 use LogicException;
+use SubProcess\Guards\TypeGuard;
 use SubProcess\IPC\Channel\SerialiseChannel;
 use SubProcess\IPC\Channel;
 use SubProcess\IPC\Stream\ResourceStream;
-use SubProcess\PcntlWrapper\SimpleWrapper;
+use SubProcess\Pcntl\RealPcntl;
 
 class Process
 {
@@ -32,30 +33,24 @@ class Process
     /** @var ExitStatus|null */
     private $exitStatus = null;
 
-    /** @var PcntlWrapper */
+    /** @var Pcntl */
     private $pcntl;
 
     /**
      * @param callable $callback
+     * @param Pcntl|null $pcntl
      */
-    public function __construct($callback)
+    public function __construct($callback, Pcntl $pcntl = null)
     {
-        $this->callback = $callback;
-        $this->pcntl = new SimpleWrapper();
-    }
+        TypeGuard::assertCallable($callback);
 
-    /**
-     * Replace pcntl wrapper.
-     *
-     * @param PcntlWrapper $wrapper
-     */
-    public function setPcntlWrapper(PcntlWrapper $wrapper)
-    {
-        $this->pcntl = $wrapper;
+        $this->callback = $callback;
+        $this->pcntl = $pcntl ? $pcntl : new RealPcntl();
     }
 
     /**
      * @param mixed $returnValue
+     * @return int
      */
     private function exitCode($returnValue)
     {
@@ -78,6 +73,9 @@ class Process
         return 1;
     }
 
+    /**
+     * @throws ForkError
+     */
     public function start()
     {
         if (!in_array($this->state, array(self::STATE_NOT_RUNNING, self::STATE_EXITED))) {
@@ -115,7 +113,6 @@ class Process
         $this->channel->close();
         $this->state = self::STATE_NOT_RUNNING;
         exit($exitCode);
-
     }
 
     private function runCallback()
@@ -135,11 +132,14 @@ class Process
 
     public function setName($name)
     {
+        TypeGuard::assertString($name);
+
         \cli_set_process_title($name);
     }
 
     /**
      * @return Channel[]
+     * @throws ForkError
      */
     private function createChannelPair()
     {
@@ -174,6 +174,7 @@ class Process
 
     /**
      * @return ExitStatus
+     * @throws ForkError
      * @throws LogicException
      */
     public function wait()
@@ -198,6 +199,7 @@ class Process
     }
 
     /**
+     * @return ExitStatus
      * @var ExitStatus
      */
     public function exitStatus()

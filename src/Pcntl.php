@@ -2,7 +2,7 @@
 
 namespace SubProcess;
 
-interface PcntlWrapper
+interface Pcntl
 {
     /**
      * @return int
@@ -10,7 +10,7 @@ interface PcntlWrapper
     public function fork();
 
     /**
-     * @return array
+     * @return ExitStatus
      */
     public function wait();
 

@@ -13,7 +13,7 @@ composer require mkolecki/sub-process
 
 ## Usage
 
-## Simple fork and communication
+## RealPcntl fork and communication
 
 To fork to sub-process first create `SubProcess\Process` instance and then call `start()` method.
 

@@ -2,9 +2,11 @@
 
 namespace SubProcess;
 
-class ForkError extends \Exception
+use Exception;
+
+class ForkError extends Exception
 {
-    public function whenAlreadyStarted()
+    public static function whenAlreadyStarted()
     {
         return new self("Cannot start new procces because it is alredy running");
     }

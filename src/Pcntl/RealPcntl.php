@@ -1,12 +1,12 @@
 <?php
 
-namespace SubProcess\PcntlWrapper;
+namespace SubProcess\Pcntl;
 
 use SubProcess\ExitStatus;
 use SubProcess\ForkError;
-use SubProcess\PcntlWrapper;
+use SubProcess\Pcntl;
 
-class SimpleWrapper implements PcntlWrapper
+class RealPcntl implements Pcntl
 {
 
     public function fork()
@@ -33,7 +33,7 @@ class SimpleWrapper implements PcntlWrapper
             );
         }
 
-        return array($pid, ExitStatus::createFromPcntlStatus($status));
+        return ExitStatus::createFromPcntlStatus($pid, $status);
     }
 
     function waitPid($pid)
@@ -46,7 +46,7 @@ class SimpleWrapper implements PcntlWrapper
             );
         }
 
-        return ExitStatus::createFromPcntlStatus($status);
+        return ExitStatus::createFromPcntlStatus($pid, $status);
     }
 
 }
